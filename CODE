@@ -1,0 +1,66 @@
+import torch
+import torch.nn as nn
+
+class UNetGenerator(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 64, 4, 2, 1),
+            nn.LeakyReLU(0.2)
+        )
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(64, 3, 4, 2, 1),
+            nn.Tanh()
+        )
+
+    def forward(self, x):
+        e = self.encoder(x)
+        d = self.decoder(e)
+        return d
+
+class PatchDiscriminator(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.model = nn.Sequential(
+            nn.Conv2d(6, 64, 4, 2, 1),
+            nn.LeakyReLU(0.2),
+            nn.Conv2d(64, 1, 4, 1, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x, y):
+        combined = torch.cat([x, y], dim=1)
+        return self.model(combined)
+# gan_loss = nn.BCELoss()
+# l1_loss = nn.L1Loss()
+
+optimizer_G = torch.optim.Adam(generator.parameters(), lr=0.0002)
+optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=0.0002)
+
+for epoch in range(epochs):
+    for input_img, target_img in dataloader:
+
+        # Train Discriminator
+        fake_img = generator(input_img)
+        real_pred = discriminator(input_img, target_img)
+        fake_pred = discriminator(input_img, fake_img.detach())
+
+        d_loss = gan_loss(real_pred, torch.ones_like(real_pred)) + \
+                 gan_loss(fake_pred, torch.zeros_like(fake_pred))
+
+        optimizer_D.zero_grad()
+        d_loss.backward()
+        optimizer_D.step()
+
+        # Train Generator
+        fake_pred = discriminator(input_img, fake_img)
+        g_loss = gan_loss(fake_pred, torch.ones_like(fake_pred)) + \
+                 100 * l1_loss(fake_img, target_img)
+
+        optimizer_G.zero_grad()
+        g_loss.backward()
+        optimizer_G.step()
+
