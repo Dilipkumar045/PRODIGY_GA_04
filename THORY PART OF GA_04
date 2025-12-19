@@ -1,0 +1,188 @@
+Image-to-Image Translation Using pix2pix (Conditional GAN)
+1. Introduction
+
+Image-to-image translation is a computer vision task where an input image from one domain is transformed into a corresponding image in another domain while preserving structural information.
+
+Examples:
+
+Sketch → Photo
+
+Black & white image → Color image
+
+Satellite image → Map
+
+Edge map → Real image
+
+The pix2pix model, proposed by Isola et al. (2017), uses a Conditional Generative Adversarial Network (cGAN) to learn this mapping using paired datasets.
+
+2. What is a Conditional GAN (cGAN)?
+
+A Generative Adversarial Network (GAN) consists of:
+
+Generator (G) – generates fake images
+
+Discriminator (D) – distinguishes real from fake images
+
+A Conditional GAN extends GANs by conditioning both G and D on additional information, such as:
+
+Class labels
+
+Text
+
+Input images
+
+In pix2pix:
+
+Condition = input image
+
+Output = translated image
+
+So the model learns:
+
+𝐺
+:
+𝑋
+→
+𝑌
+G:X→Y
+
+Where:
+
+X = input image (e.g., sketch)
+
+Y = output image (e.g., photo)
+
+3. pix2pix Architecture Overview
+
+pix2pix consists of two main networks:
+
+3.1 Generator – U-Net Architecture
+
+The generator uses a U-Net architecture:
+
+Encoder: downsamples image
+
+Decoder: upsamples image
+
+Skip connections: preserve spatial details
+
+Why U-Net?
+
+Maintains fine-grained details
+
+Prevents information loss during downsampling
+
+3.2 Discriminator – PatchGAN
+
+The discriminator is a PatchGAN, which:
+
+Classifies image patches (e.g., 70×70) as real or fake
+
+Focuses on local texture realism
+
+Improves sharpness
+
+Instead of one output value, PatchGAN outputs a matrix of real/fake predictions.
+
+4. Training Data Requirement
+
+pix2pix requires paired images:
+
+Input Image | Target Image
+-------------------------
+Sketch      | Photo
+Edges       | Real image
+Satellite   | Map
+
+
+Both images must be:
+
+Aligned
+
+Same size
+
+Same resolution
+
+5. Loss Functions in pix2pix
+
+pix2pix combines two loss functions:
+
+
+
+6. pix2pix Training Process
+
+Input image X is given to the generator
+
+Generator produces fake image G(X)
+
+Discriminator compares:
+
+(X, Y) → real pair
+
+(X, G(X)) → fake pair
+
+Discriminator updates weights
+
+Generator updates weights using GAN + L1 loss
+
+Process repeats for multiple epochs
+
+8. Evaluation of pix2pix Model
+Qualitative Evaluation:
+
+Visual realism
+
+Structural accuracy
+
+Texture quality
+
+Quantitative Metrics:
+
+L1 / L2 error
+
+SSIM
+
+PSNR
+
+FID (advanced)
+
+9. Applications of pix2pix
+
+Photo colorization
+
+Medical image translation
+
+Map generation
+
+Artistic style transfer
+
+Image enhancement
+
+Satellite imagery analysis
+
+10. Advantages of pix2pix
+
+High-quality translations
+
+Learns complex mappings
+
+Preserves spatial structure
+
+Effective with limited data
+
+11. Limitations
+
+Requires paired datasets
+
+Sensitive to alignment errors
+
+Limited diversity in outputs
+
+High computational cost
+
+12. pix2pix vs CycleGAN
+Feature	pix2pix	CycleGAN
+Dataset	Paired	Unpaired
+Accuracy	High	Moderate
+Complexity	Lower	Higher
+Use Case	Supervised	Unsupervised
